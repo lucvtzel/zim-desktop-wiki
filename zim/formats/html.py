@@ -101,6 +101,7 @@ class Dumper(DumperClass):
 		return strings
 
 	def dump_block(self, tag, attrib, strings, _extra=None):
+
 		if strings and strings[-1].endswith('<br>\n'):
 			strings[-1] = strings[-1][:-5]
 		elif strings and strings[-1].endswith('\n'):
@@ -136,7 +137,84 @@ class Dumper(DumperClass):
 		strings.append(end)
 		return strings
 
-	dump_p = dump_block
+	def dump_indent(self, tag, attrib, strings):
+		# OPEN ISSUE: no indent for para
+		start = '<' + tag + '>'
+		strings.insert(0, start)
+		end = '</' + tag +'>\n'
+		strings.append(end)
+		return strings
+
+	def dump_p(self, tag, attrib, strings, _extra=None):
+		print('*' * 72)
+		print("tag: {} ".format(str(tag)))
+		print("attrib: {} ".format(str(attrib)))
+		print("extra: {} ".format(str(_extra)))
+		for s in strings:
+			print(s)
+
+		# remove trailings <br>\n and \n
+		if strings and strings[-1].endswith('<br>\n'):
+			strings[-1] = strings[-1][:-5]
+		elif strings and strings[-1].endswith('\n'):
+			strings[-1] = strings[-1][:-1]
+
+		start = '\n<' + tag
+		if self._isrtl:
+			start += ' dir=\'rtl\''
+		self._isrtl = None # reset
+
+		if 'indent' in attrib:
+			level = int(attrib['indent'])
+			start += ' style=\'padding-left: %ipt\'' % (30 * level)
+
+		if _extra:
+			start += ' ' + _extra
+		start += '>\n'
+
+		end = '\n</' + tag + '>\n'
+
+		if strings and strings[0].find('<ul>') == -1 and \
+										strings[0].find('<ol>') == -1:
+			result = [start]
+			p_closed = False
+			list_cnt = 0
+		else:
+			result=[]
+			p_closed = True
+			list_cnt = 1
+
+		i = 0
+		while i < len(strings) -1 :
+			result.append(strings[i])
+			if p_closed and list_cnt == 0:
+				result.append(start)
+				p_closed = False
+
+			if strings[i+1].find('<ul>') > -1 or \
+										strings[i+1].find('<ol>') > -1:
+				if list_cnt == 0:
+					# remove trailings <br>\n and \n
+					if strings[i].endswith('<br>\n'):
+						result[-1] = strings[i][:-5]
+					elif strings[i].endswith('\n'):
+						resuls[-1] = strings[i][:-1]
+					result.append(end)
+					p_closed = True
+				list_cnt += 1
+			elif strings[i+1].find('</ul>') > -1 or \
+										strings[i+1].find('</ol>') > -1:
+				list_cnt -= 1
+			i += 1
+
+		result.append(strings[-1])
+		if not p_closed:
+			result.append(end)
+
+		return result
+
+
+	# ~ dump_p = dump_block
 	dump_div = dump_block
 	dump_pre = dump_block
 	dump_ul = dump_block
