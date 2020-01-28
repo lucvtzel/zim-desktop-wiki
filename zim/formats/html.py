@@ -174,8 +174,8 @@ class Dumper(DumperClass):
 
 		end = '\n</' + tag + '>\n'
 
-		if strings and strings[0].find('<ul') == -1 and \
-										strings[0].find('<ol') == -1:
+		if strings and strings[0][:4].find('<ul') == -1 and \
+									strings[0][:4].find('<ol') == -1:
 			result = [start]
 			p_closed = False
 			list_cnt = 0
@@ -191,8 +191,9 @@ class Dumper(DumperClass):
 				result.append(start)
 				p_closed = False
 
-			if strings[i+1].find('<ul') > -1 or \
-										strings[i+1].find('<ol') > -1:
+			if strings[i+1].lstrip().find('<ul') == 0 or \
+								strings[i+1].lstrip().find('<ol') == 0:
+
 				if list_cnt == 0:
 					# remove trailings <br>\n and \n
 					if strings[i].endswith('<br>\n'):
