@@ -146,12 +146,12 @@ class Dumper(DumperClass):
 		return strings
 
 	def dump_p(self, tag, attrib, strings, _extra=None):
-		print('*' * 72)
-		print("tag: {} ".format(str(tag)))
-		print("attrib: {} ".format(str(attrib)))
-		print("extra: {} ".format(str(_extra)))
-		for s in strings:
-			print(s)
+		# ~ print('*' * 72)
+		# ~ print("tag: {} ".format(str(tag)))
+		# ~ print("attrib: {} ".format(str(attrib)))
+		# ~ print("extra: {} ".format(str(_extra)))
+		# ~ for s in strings:
+			# ~ print(s)
 
 		# remove trailings <br>\n and \n
 		if strings and strings[-1].endswith('<br>\n'):
@@ -159,7 +159,7 @@ class Dumper(DumperClass):
 		elif strings and strings[-1].endswith('\n'):
 			strings[-1] = strings[-1][:-1]
 
-		start = '\n<' + tag
+		start = '<' + tag
 		if self._isrtl:
 			start += ' dir=\'rtl\''
 		self._isrtl = None # reset
@@ -174,8 +174,8 @@ class Dumper(DumperClass):
 
 		end = '\n</' + tag + '>\n'
 
-		if strings and strings[0].find('<ul>') == -1 and \
-										strings[0].find('<ol>') == -1:
+		if strings and strings[0].find('<ul') == -1 and \
+										strings[0].find('<ol') == -1:
 			result = [start]
 			p_closed = False
 			list_cnt = 0
@@ -191,8 +191,8 @@ class Dumper(DumperClass):
 				result.append(start)
 				p_closed = False
 
-			if strings[i+1].find('<ul>') > -1 or \
-										strings[i+1].find('<ol>') > -1:
+			if strings[i+1].find('<ul') > -1 or \
+										strings[i+1].find('<ol') > -1:
 				if list_cnt == 0:
 					# remove trailings <br>\n and \n
 					if strings[i].endswith('<br>\n'):
@@ -210,6 +210,8 @@ class Dumper(DumperClass):
 		result.append(strings[-1])
 		if not p_closed:
 			result.append(end)
+		else:
+			result.append('\n')
 
 		return result
 
