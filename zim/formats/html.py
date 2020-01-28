@@ -153,11 +153,15 @@ class Dumper(DumperClass):
 		# ~ for s in strings:
 			# ~ print(s)
 
-		# remove trailings <br>\n and \n
-		if strings and strings[-1].endswith('<br>\n'):
-			strings[-1] = strings[-1][:-5]
-		elif strings and strings[-1].endswith('\n'):
-			strings[-1] = strings[-1][:-1]
+		def remove_trailings(astring):
+			"""remove trailings <br>\n and \n"""
+			if astring.endswith('<br>\n'):
+				return astring[:-5]
+			if astring.endswith('\n'):
+				return astring[:-1]
+
+		if not strings:
+			return strings
 
 		start = '<' + tag
 		if self._isrtl:
@@ -196,10 +200,8 @@ class Dumper(DumperClass):
 
 				if list_cnt == 0:
 					# remove trailings <br>\n and \n
-					if strings[i].endswith('<br>\n'):
-						result[-1] = strings[i][:-5]
-					elif strings[i].endswith('\n'):
-						resuls[-1] = strings[i][:-1]
+					result[-1] = remove_trailings(result[-1])
+
 					result.append(end)
 					p_closed = True
 				list_cnt += 1
@@ -209,6 +211,10 @@ class Dumper(DumperClass):
 			i += 1
 
 		result.append(strings[-1])
+
+		# remove trailings <br>\n and \n
+		result[-1] = remove_trailings(result[-1])
+
 		if not p_closed:
 			result.append(end)
 		else:
