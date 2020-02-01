@@ -38,7 +38,7 @@ def html_encode(text):
 
 class Dumper(DumperClass):
 
-	TAGS = {
+	TAGS_HTML4 = {
 		EMPHASIS: ('<i>', '</i>'),
 		STRONG: ('<b>', '</b>'),
 		MARK: ('<u>', '</u>'),
@@ -47,13 +47,32 @@ class Dumper(DumperClass):
 		TAG: ('<span class="zim-tag">', '</span>'),
 		SUBSCRIPT: ('<sub>', '</sub>'),
 		SUPERSCRIPT: ('<sup>', '</sup>'),
+	}
 
+	TAGS_HTML5 = {
+		EMPHASIS: ('<em>', '</em>'),
+		STRONG: ('<strong>', '</strong>'),
+		MARK: ('<mark>', '</mark>'),
+		STRIKE: ('<del>', '</del>'),
+		VERBATIM: ('<code>', '</code>'),
+		TAG: ('<span class="zim-tag">', '</span>'),
+		SUBSCRIPT: ('<sub>', '</sub>'),
+		SUPERSCRIPT: ('<sup>', '</sup>'),
 	}
 
 	TEMPLATE_OPTIONS = {
 		'empty_lines': Choice('default', ('default', 'remove')),
 		'line_breaks': Choice('default', ('default', 'remove')),
+		'html_version': Choice('default', ('default', 'html4', 'html5')),
 	}
+
+	def __init__(self, linker=None, template_options=None):
+		super().__init__(linker, template_options)
+		if self.template_options and \
+				(self.template_options.get('html_version') == 'html5'):
+			self.TAGS = Dumper.TAGS_HTML5
+		else:
+			self.TAGS = Dumper.TAGS_HTML4
 
 	def dump(self, tree):
 		# FIXME should be an init function for this
