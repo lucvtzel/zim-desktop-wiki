@@ -65,7 +65,7 @@ class TestFormatMixin(object):
 
 		return text
 
-	def testFormat(self):
+	def testFormat(self, template_options=None):
 		'''Test if formats supports full syntax
 		Uses data in C{tests/data/formats} as reference data.
 		'''
@@ -73,7 +73,7 @@ class TestFormatMixin(object):
 		wanted = self.getReferenceData()
 		reftree = tests.new_parsetree_from_xml(self.reference_xml)
 		linker = StubLinker(Dir('tests/data/formats'))
-		dumper = self.format.Dumper(linker=linker)
+		dumper = self.format.Dumper(linker=linker, template_options=template_options)
 		result = ''.join(dumper.dump(reftree))
 		#~ print('\n' + '>'*80 + '\n' + result + '\n' + '<'*80 + '\n')
 		self.assertMultiLineEqual(result, wanted)
@@ -688,6 +688,17 @@ class TestHtmlFormat(tests.TestCase, TestFormatMixin):
 			'</p>\n'
 		)
 
+class TestHtml5Format(TestHtmlFormat):
+
+	reference_data = {
+		'html': 'export5.html',
+	}
+
+	def testFormat(self):
+		'''Test if formats supports full syntax
+		Uses data in C{tests/data/formats} as reference data.
+		'''
+		super().testFormat(template_options={'html_version': 'html5'})
 
 
 class TestMarkdownFormat(tests.TestCase, TestFormatMixin):
